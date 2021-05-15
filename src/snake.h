@@ -19,8 +19,9 @@ class Snake {
   void GrowBody();
   bool SnakeCell(int x, int y);
 
-  Direction direction = Direction::kUp;
+  void ResetSnake();
 
+  Direction direction = Direction::kUp;
   float speed{0.1f};
   int size{1};
   bool alive{true};

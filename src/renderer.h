@@ -23,8 +23,8 @@ class Renderer {
   void UpdateWindowTitle(int score, int fps);
   void RenderLevel1(Snake const snake, SDL_Point const &food, 
                     int const &score_user);
-
-
+  void RenderLevel2(Snake const snake, SDL_Point const &food, int const &score_user, 
+                    const std::vector<std::shared_ptr<SDL_Point>> obstacles);
 
  private:
   SDL_Window *sdl_window;

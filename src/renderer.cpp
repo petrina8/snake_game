@@ -1,4 +1,5 @@
 #include "renderer.h"
+
 #include <iostream>
 #include <string>
 
@@ -42,6 +43,18 @@ Renderer::Renderer(const std::size_t screen_width,
   _gameplay.w = screen_width;
   _gameplay.h = screen_height - hud_height;
 
+    //Initialize PNG loading
+  /*imgFlags = IMG_INIT_PNG;
+  if( !( IMG_Init( imgFlags ) && imgFlags ) )
+  {
+      printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
+      //success = false;
+  }
+  else
+  {
+      //Get window surface
+      //gScreenSurface = SDL_GetWindowSurface( gWindow );
+  }*/
 }
 
 Renderer::~Renderer() {
@@ -78,41 +91,15 @@ void Renderer::Render(Snake const snake, SDL_Point const &food,
 
   RenderFood(food, block);
   RenderSnake(snake, block);
-  // Render snake's body
-  /*SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-  for (SDL_Point const &point : snake.body) {
-    block.x = point.x * block.w;
-    block.y = point.y * block.h;
-    SDL_RenderFillRect(sdl_renderer, &block);
-  }
-
-  // Render snake's head
-  block.x = static_cast<int>(snake.head_x) * block.w;
-  block.y = static_cast<int>(snake.head_y) * block.h;
-  if (snake.alive) {
-    SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-  } else {
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-  }
-  SDL_RenderFillRect(sdl_renderer, &block);
-*/
   // Update Screen
   SDL_RenderPresent(sdl_renderer);
 }
-
-/*void Renderer::RenderNextLevel(Snake const snake, SDL_Point const &food, 
-                               int const &score_user, int const &level) {
-                      
-}
-*/
 
 void Renderer::UpdateWindowTitle(int score, int fps) {
   std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
-
-// level with obstacles
 void Renderer::RenderLevel1(Snake const snake, SDL_Point const &food, 
                             int const &score_user) {
   SDL_Rect block;
@@ -136,6 +123,36 @@ void Renderer::RenderLevel1(Snake const snake, SDL_Point const &food,
   SDL_RenderPresent(sdl_renderer);  
 }
 
+// Level with obstacles
+void Renderer::RenderLevel2(Snake const snake, SDL_Point const &food, int const &score_user, 
+                            const std::vector<std::shared_ptr<SDL_Point>> obstacles) {
+  SDL_Rect block;
+  block.w = _gameplay.w / grid_width;
+  block.h = _gameplay.h / grid_height;
+
+  // Clear screen
+  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+  SDL_RenderClear(sdl_renderer);
+
+  _hud->UpdateUserScore(sdl_renderer, score_user);
+
+  // Render gameplay
+  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0xFF, 0x00);
+  SDL_RenderSetViewport(sdl_renderer, &_gameplay);
+
+  // Render purple obstacles
+  SDL_SetRenderDrawColor(sdl_renderer, 0x80, 0x00, 0x80, 0xFF);
+  for (auto obstacle : obstacles) {
+    block.x = obstacle->x * block.w;
+    block.y = obstacle->y * block.h;
+    SDL_RenderFillRect(sdl_renderer, &block);
+  }
+
+  RenderFood(food, block);
+  RenderSnake(snake, block);
+  // Update Screen
+  SDL_RenderPresent(sdl_renderer); 
+}
 
 
 void Renderer::RenderFood(SDL_Point const &food, SDL_Rect block) {

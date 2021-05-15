@@ -19,7 +19,7 @@ class Game {
   int GetScoreEnemy() const;
   int GetSizeSnakeUser() const;
 
-  void InitLevel();
+  void ResetLevel();
 
  private:
   Snake snake_user;
@@ -27,6 +27,7 @@ class Game {
   SDL_Point food;
 
   std::shared_ptr<HUD> _hud;
+  std::vector<std::shared_ptr<SDL_Point>> obstacles;
 
   std::random_device dev;
   std::mt19937 engine;
@@ -40,6 +41,9 @@ class Game {
   bool has_enemy{false};
 
   void PlaceFood();
+  bool ObstaclesCell(int x, int y);
+  void PlaceObstacles();
+  void CheckObstacleCollision();
   void Update();
 };
 
