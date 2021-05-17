@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 #include <SDL.h>
+#include <SDL_image.h>
+
 #include "snake.h"
 #include "hud.h"
 
@@ -25,6 +27,7 @@ class Renderer {
                     int const &score_user);
   void RenderLevel2(Snake const snake, SDL_Point const &food, int const &score_user, 
                     const std::vector<std::shared_ptr<SDL_Point>> obstacles);
+  void DrawImage(const char *image_path);
 
  private:
   SDL_Window *sdl_window;
@@ -38,8 +41,14 @@ class Renderer {
   const std::size_t grid_width;
   const std::size_t grid_height;
 
+  int imgFlags; 
+  SDL_Surface *image_surface = NULL;
+  SDL_Texture *sdl_texture = NULL;
+
+
   void RenderFood(SDL_Point const &food, SDL_Rect block);
   void RenderSnake(Snake const snake, SDL_Rect block);
+  SDL_Surface *loadMedia(std::string image_path);
 
 };
 

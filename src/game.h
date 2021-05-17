@@ -19,7 +19,7 @@ class Game {
   int GetScoreEnemy() const;
   int GetSizeSnakeUser() const;
 
-  void ResetLevel();
+  void ResetLevel(Renderer &renderer);
 
  private:
   Snake snake_user;
@@ -44,7 +44,7 @@ class Game {
   bool ObstaclesCell(int x, int y);
   void PlaceObstacles();
   void CheckObstacleCollision();
-  void Update();
+  void Update(Renderer &renderer);
 };
 
 #endif

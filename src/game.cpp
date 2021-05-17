@@ -19,27 +19,22 @@ Game::Game(std::size_t grid_width, std::size_t grid_height, std::size_t screen_w
   PlaceFood();
 }
 
-
 void Game::Run(Controller const &controller, Renderer &renderer,
                std::size_t target_frame_duration) {
-  Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
   Uint32 frame_duration;
   int frame_count = 0;
   bool running = true;
 
-  ResetLevel();
-  renderer.SetHud(_hud);
-
-
-/*  while (running) {
+  // Start level1
+  ResetLevel(renderer);
+  while (running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake_user);
-    Update();
-
+    Update(renderer);
     renderer.RenderLevel1(snake_user, food, score_user);
 
     frame_end = SDL_GetTicks();
@@ -56,28 +51,32 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       SDL_Delay(target_frame_duration - frame_duration);
     }
     // Go to level 2
-    if (score_user == 3) {
+    if (score_user == 10) {
       level = 2;
       break;
     }
   }
 
-*/
-
-  score_user = 0;
-  snake_user.ResetSnake();
-  PlaceObstacles();
-
+  // Start level2
+  SDL_Delay(1000);
+  ResetLevel(renderer);
   while (running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake_user);
     CheckObstacleCollision();
-    Update();
+    Update(renderer);
 
-    renderer.RenderLevel2(snake_user, food, score_user, obstacles);
+    if (snake_user.alive) {
+      renderer.RenderLevel2(snake_user, food, score_user, obstacles);
+    } else {
+      renderer.RenderLevel2(snake_user, food, score_user, obstacles);
 
+      SDL_Delay(1000);
+      renderer.DrawImage("../resource/image/gameover.png");
+      running=false;
+    }
     frame_end = SDL_GetTicks();
 
     // Keep track of how long each loop through the input/update/render cycle
@@ -93,22 +92,26 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     }
     // Go to level 2
     if (score_user == 10) {
-      level = 3;
+      SDL_Delay(1000);
+      renderer.DrawImage("../resource/image/endgame.png");
       break;
     }
-
-  }
-
-  std::cout << "Go NExt Level!!" << std::endl;
+  } 
 }
 
-void Game::ResetLevel() {
+void Game::ResetLevel(Renderer &renderer) {
   if (level == 1) {
     _hud->SetHasEnemy(false);
     _hud->SetSizeTile(size_tile);
+    renderer.SetHud(_hud);
+    renderer.DrawImage("../resource/image/snakegame.png");
+
   } else if (level == 2) {
-    
-  }
+    renderer.DrawImage("../resource/image/levelup.png");
+    score_user = 0;
+    snake_user.ResetSnake();
+    PlaceObstacles(); 
+  } 
 }
 
 //void Game::PlayLevel1() {}
@@ -118,9 +121,6 @@ void Game::PlaceFood() {
   while (true) {
     x = random_w(engine);
     y = random_h(engine);
-
-    std::cout << "X: " << x << std::endl;
-    std::cout << "Y: " << y << std::endl;
 
     // Check that the location is not occupied by a snake item before placing
     // food.
@@ -170,12 +170,6 @@ void Game::PlaceObstacles() {
 void Game::CheckObstacleCollision() {
   // Check if the snake has died.
   for (auto obstacle : obstacles) {
-    std::cout << "snake_user.headX:: " << snake_user.head_x << std::endl;
-    std::cout << "obstacleX:: " << obstacle->x << std::endl;
-
-    std::cout << "snake_user.headY:: " << snake_user.head_y << std::endl;
-    std::cout << "obstacleY:: " << obstacle->y << std::endl;
-
     if (static_cast<int>(snake_user.head_x) == obstacle->x && 
         static_cast<int>(snake_user.head_y) == obstacle->y) {
       snake_user.alive = false;
@@ -183,12 +177,12 @@ void Game::CheckObstacleCollision() {
   }
 }
 
-
-void Game::Update() {
-  if (!snake_user.alive) return;
+void Game::Update(Renderer &renderer) {
+  if (!snake_user.alive) {
+    return;
+  }
 
   snake_user.Update();
-
   int new_x = static_cast<int>(snake_user.head_x);
   int new_y = static_cast<int>(snake_user.head_y);
 
@@ -201,7 +195,6 @@ void Game::Update() {
     snake_user.GrowBody();
     snake_user.speed += 0.02;
   }
-
 }
 
 int Game::GetScoreUser() const { return score_user; }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <SDL_ttf.h>
 
 const size_t hud_height = 40;
 
@@ -20,19 +21,20 @@ Renderer::Renderer(const std::size_t screen_width,
     std::cerr << "SDL_Error: " << SDL_GetError() << "\n";
   }
 
+
   // Create Window
   sdl_window = SDL_CreateWindow("Snake Game", SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED, screen_width,
                                 screen_height, SDL_WINDOW_SHOWN);
 
-  if (nullptr == sdl_window) {
+  if (sdl_window == nullptr) {
     std::cerr << "Window could not be created.\n";
     std::cerr << " SDL_Error: " << SDL_GetError() << "\n";
   }
 
   // Create renderer
   sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED);
-  if (nullptr == sdl_renderer) { 
+  if (sdl_renderer == nullptr) { 
     std::cerr << "Renderer could not be created.\n";
     std::cerr << "SDL_Error: " << SDL_GetError() << "\n";
   }
@@ -43,56 +45,23 @@ Renderer::Renderer(const std::size_t screen_width,
   _gameplay.w = screen_width;
   _gameplay.h = screen_height - hud_height;
 
-    //Initialize PNG loading
-  /*imgFlags = IMG_INIT_PNG;
-  if( !( IMG_Init( imgFlags ) && imgFlags ) )
-  {
-      printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
-      //success = false;
+  //Initialize JPG loading
+  imgFlags = IMG_INIT_PNG;
+  if (!( IMG_Init( imgFlags ) & imgFlags )) {
+      std::cerr <<  "SDL_image could not initialize! SDL_image Error\n" << IMG_GetError() << "\n";
+  } else {
+    //Get window surface
+    image_surface = SDL_GetWindowSurface(sdl_window);
   }
-  else
-  {
-      //Get window surface
-      //gScreenSurface = SDL_GetWindowSurface( gWindow );
-  }*/
 }
 
 Renderer::~Renderer() {
+  SDL_DestroyTexture(sdl_texture);
+  SDL_FreeSurface(image_surface);
+  SDL_DestroyRenderer(sdl_renderer);
   SDL_DestroyWindow(sdl_window);
+  IMG_Quit();
   SDL_Quit();
-}
-
-
-void Renderer::Render(Snake const snake, SDL_Point const &food, 
-                      int const &score_user, int const &score_enemy) {
-  SDL_Rect block;
-  block.w = _gameplay.w / grid_width;
-  block.h = _gameplay.h / grid_height;
-
-  // Clear screen
-  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
-  SDL_RenderClear(sdl_renderer);
-
-  _hud->UpdateUserScore(sdl_renderer, score_user);
-  //hud.UpdateEnemyScore(sdl_renderer, score);
-
-  /*SDL_Rect myRect;
-  SDL_RenderGetViewport(sdl_renderer, &myRect);
-
-  std::cout << "myRect.X: " << myRect.x << std::endl;
-  std::cout << "myRect.Y: " << myRect.y << std::endl;
-  std::cout << "myRect.w: " << myRect.w << std::endl;
-  std::cout << "myRect.h: " << myRect.h << std::endl;
-  */
-
-  // Render gameplay
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0xFF, 0x00);
-  SDL_RenderSetViewport(sdl_renderer, &_gameplay);
-
-  RenderFood(food, block);
-  RenderSnake(snake, block);
-  // Update Screen
-  SDL_RenderPresent(sdl_renderer);
 }
 
 void Renderer::UpdateWindowTitle(int score, int fps) {
@@ -180,4 +149,27 @@ void Renderer::RenderSnake(Snake const snake, SDL_Rect block) {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
   }
   SDL_RenderFillRect(sdl_renderer, &block);
+}
+
+void Renderer::DrawImage(const char *image_path) {
+  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+  SDL_RenderClear(sdl_renderer);
+
+  SDL_Rect m_image_position;
+  m_image_position.x = 0;
+  m_image_position.y = 0;
+  m_image_position.w = 640;
+  m_image_position.h = 480;
+  
+  image_surface = IMG_Load(image_path);
+  sdl_texture = SDL_CreateTextureFromSurface(sdl_renderer, image_surface);
+
+  if (!image_surface) {
+    std::cout << "Fail to load image!" << std::endl;
+    return;
+  } else {
+    SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+    SDL_RenderPresent(sdl_renderer);
+    SDL_Delay(2000);
+  }
 }
