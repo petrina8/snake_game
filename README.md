@@ -12,6 +12,9 @@ In this project, I extended the Snake Game in order to insert one more
 level, a HUD, and draw images to show game states like Start Game, 
 Level Up, Game Over and End Game.
 
+The HUD is a yellow bar represents the food that Snake is eating. It is 
+necessary to fill it to go to next level.
+
 ## Dependencies for Running Locally
 * cmake >= 3.7
   * All OSes: [click here for installation instructions](https://cmake.org/install/)
