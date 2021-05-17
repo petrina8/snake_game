@@ -110,11 +110,10 @@ void Game::ResetLevel(Renderer &renderer) {
     renderer.DrawImage("../resource/image/levelup.png");
     score_user = 0;
     snake_user.ResetSnake();
+    snake_user.speed = 0.1;
     PlaceObstacles(); 
   } 
 }
-
-//void Game::PlayLevel1() {}
 
 void Game::PlaceFood() {
   int x, y;
