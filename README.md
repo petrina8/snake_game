@@ -15,6 +15,22 @@ Level Up, Game Over and End Game.
 The HUD is a yellow bar represents the food that Snake is eating. It is 
 necessary to fill it to go to next level.
 
+## Which rubric points are addressed.
+* [Loops, Functions, I/O]
+* A variety of control structures are used in the project.
+ * game.cpp -> line 30, 137
+* [Object Oriented Programming]
+* The project uses Object Oriented Programming techniques
+ * hud.cpp/hud.h -> entire files
+* Classes use appropriate access specifiers for class members.
+ * hud.h -> lines 10, 23
+* [Memory Management]
+* The project makes use of references in function declarations.
+ * renderer.cpp -> lines 72,96
+* The project uses smart pointers instead of raw pointers.
+ * game.cpp -> lines 17, 138, 158. 
+ * renderer.cpp -> line 82
+ 
 ## Dependencies for Running Locally
 * cmake >= 3.7
   * All OSes: [click here for installation instructions](https://cmake.org/install/)
